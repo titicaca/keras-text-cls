@@ -11,4 +11,13 @@ class BaseTokenizer(object):
         # Split by " ", only used for english corpus
         return body.split(" ")
 
-
+    def text_to_words(self, text):
+        """
+        transform text to list of words
+        :param text: text is a list of sentences or documents
+        :return: a 2d list of word tokens
+        """
+        res = []
+        for sentence in text:
+            res.append(list(self.tokenize(sentence)))
+        return res

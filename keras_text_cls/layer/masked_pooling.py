@@ -1,5 +1,5 @@
 import logging
-import keras as K
+import keras.backend as K
 import tensorflow as tf
 from keras.engine.topology import Layer
 

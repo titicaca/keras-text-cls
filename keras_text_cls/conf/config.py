@@ -1,6 +1,9 @@
 import logging
 import configparser
-from keras_text_cls.conf import CONFIG_FILE
+import os
+
+CONFIG_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_FILE = os.path.join(CONFIG_DIR, "keras-text-cls.cfg")
 
 
 class Config(object):
@@ -21,4 +24,4 @@ class Config(object):
         }[levels]
 
     def get_log_level(self):
-        return self.__get_log_level(self.__config["log"]["log.level"])
+        return self.__get_log_level(self.__config.get("log", "log.level"))

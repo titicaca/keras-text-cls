@@ -61,8 +61,8 @@ class TextMLP(BaseModel):
                                                           trainable=embedding_trainable,
                                                           mask_zero=True)
         else:
-            assert(vocabs is not None, "vocabs cannot be None when embedding matrix is None")
-            assert(embedding_trainable, "embedding_trainable cannot be false when embedding matrix is None")
+            assert vocabs is not None, "vocabs cannot be None when embedding matrix is None"
+            assert embedding_trainable, "embedding_trainable cannot be false when embedding matrix is None"
             self.layer_embedding = keras.layers.Embedding(len(vocabs)+1,
                                                           embedding_dim,
                                                           input_length=max_seq_len,
@@ -98,10 +98,10 @@ class TextMLP(BaseModel):
         :return: predicted class probabilities
         """
         # padding inputs
-        pad_sequences(inputs, maxlen=self.max_seq_len, padding='post', value=0.)
-        x = np.array(inputs)
-        assert(len(x.shape) == 2)
-        x = self.layer_embedding(x)
+        # pad_sequences(inputs, maxlen=self.max_seq_len, padding='post', value=0.)
+        # x = np.array(inputs)
+        # assert(len(x.shape) == 2)
+        x = self.layer_embedding(inputs)
         x = self.layer_pooling(x)
         for hidden in self.layer_hiddens:
             x = hidden(x)
