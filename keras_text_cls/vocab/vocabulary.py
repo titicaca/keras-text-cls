@@ -5,7 +5,7 @@ from keras_text_cls.vocab.util import *
 class Vocabulary(object):
     def __init__(self):
         self.word2idx = {"<PAD>": 0, "<UNKNOWN>": 1}
-        self.vocabs = ["<PAD>", "<UNKNOWN>"]
+        self.vocabs = {0: "<PAD>", 1: "<UNKNOWN>"}
         self.num_words = 0
         self.word_freq = {}
         # TODO add TF-IDF calculation
@@ -26,8 +26,7 @@ class Vocabulary(object):
                 if w not in self.word2idx.keys():
                     idx += 1
                     self.word2idx[w] = idx
-                    self.vocabs.append(w)
-                    assert(self.vocabs[idx] == w)
+                    self.vocabs[idx] = w
                     self.num_words += 1
                     self.word_freq[w] = 1
                 else:

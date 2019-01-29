@@ -1,7 +1,6 @@
 import logging
 import numpy as np
 import keras
-from keras.preprocessing.sequence import pad_sequences
 from keras_text_cls.model.base_model import BaseModel
 from keras_text_cls.layer import MaskedGlobalAvgPool1D
 
@@ -11,20 +10,33 @@ class TextMLP(BaseModel):
     Multiple Layer Perceptron for Text Classification
 
     #Arguments
-        num_classes: the number of classes
-        embedding_dim: the dimention of embedding vector, default is 128
-        embedding_matrix: embedding matrix, defult is None
-        embedding_trainable: is the embedding layer trainable in the network, must be set to True,
+        num_classes: int
+            the number of classes
+        embedding_dim: int
+            the dimention of embedding vector, default is 128
+        embedding_matrix: 2d np.array
+            embedding matrix, default is None
+        embedding_trainable: bool
+            is the embedding layer trainable in the network, must be set to True,
             when embedding matrix is None. Default is True. Set False if embedding matrix is pre-trained
             and set in the model
-        vocabs: vocab list, index zero is reserved for masking
-        pooling_strategy: "REDUCE_MEAN" or "REDUCE_MAX"
-        max_seq_len: maximum length of words for each text, longer text will be truncated more than max_seq_len,
+        vocabs: dict {index: word}
+            vocab dict, key is the index, value if the corresponding word
+            index zero is reserved for <PADDING>
+            index one is reserved for <UNKNOWN>
+        pooling_strategy: str
+            pooling strategy for word sequences, either "REDUCE_MEAN" or "REDUCE_MAX"
+        max_seq_len: int
+            maximum length of words for each text, longer text will be truncated more than max_seq_len,
             shorter text will be padded
-        num_hidden_units: an array of positive integers, indicating the number of units for each hidden layer
-        hidden_activation: activation function of neutral unit, default is "relu"
-        dropout: dropout rate, must be equal or greater than 0 and equal or less than 1, default is 0.5
-        multi_label: is the labels are multi-label classification, default is True
+        num_hidden_units: integer array
+            an array of positive integers, indicating the number of units for each hidden layer
+        hidden_activation: str
+            activation function of neutral unit, default is "relu"
+        dropout: float (0,1)
+            dropout rate, must be equal or greater than 0 and equal or less than 1, default is 0.5
+        multi_label: bool
+            is the labels are multi-label classification, default is True
     """
     def __init__(self, num_classes,
                  embedding_dim=128, embedding_matrix=None, embedding_trainable=True, vocabs=None,
@@ -63,7 +75,8 @@ class TextMLP(BaseModel):
         else:
             assert vocabs is not None, "vocabs cannot be None when embedding matrix is None"
             assert embedding_trainable, "embedding_trainable cannot be false when embedding matrix is None"
-            self.layer_embedding = keras.layers.Embedding(len(vocabs)+1,
+            # vocabs contain masking zero already
+            self.layer_embedding = keras.layers.Embedding(len(vocabs),
                                                           embedding_dim,
                                                           input_length=max_seq_len,
                                                           trainable=True,
@@ -97,10 +110,6 @@ class TextMLP(BaseModel):
         :param inputs: 2-dim list, the element is the word index starting from 1
         :return: predicted class probabilities
         """
-        # padding inputs
-        # pad_sequences(inputs, maxlen=self.max_seq_len, padding='post', value=0.)
-        # x = np.array(inputs)
-        # assert(len(x.shape) == 2)
         x = self.layer_embedding(inputs)
         x = self.layer_pooling(x)
         for hidden in self.layer_hiddens:
