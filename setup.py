@@ -11,13 +11,14 @@ setup(
     description="Text Classification Lib on Keras",
     long_description=io.open("README.md", encoding="UTF-8").read(),
     license="MIT",
+    url="https://github.com/titicaca/keras_text_cls",
     packages=find_packages(),
     entry_points={
     },
-    data_files=[('data', []),
+    data_files=[#('data', []),
                 ('doc', ['README.md']),
                 ('conf', ['keras_text_cls/conf/keras_text_cls.cfg']),
-                ('dict', [])],
+                ('dict', ['keras_text_cls/dict/jieba_dict', 'keras_text_cls/dict/stop_words'])],
     include_package_data=True,
     classifiers=[
         "Environment :: Web Environment",

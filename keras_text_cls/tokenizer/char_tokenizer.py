@@ -4,6 +4,9 @@ from keras_text_cls.dict import load_stop_words
 
 
 class CharTokenizer(BaseTokenizer):
+    """
+    A character tokenizer
+    """
     def __init__(self, **kwargs):
         self.stop_words = load_stop_words()
 

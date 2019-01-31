@@ -5,6 +5,10 @@ from keras_text_cls.tokenizer.base_tokenizer import BaseTokenizer
 
 
 class JiebaTokenizer(BaseTokenizer):
+    """
+    A Chinese Tokenizer Wrapper of Jieba
+    Reference to: https://github.com/fxsjy/jieba
+    """
     def __init__(self, **kwargs):
         jieba.load_userdict(JIEBA_DICT_PATH)
         logging.info("loaded jieba dict: " + JIEBA_DICT_PATH)

@@ -3,7 +3,7 @@ import configparser
 import os
 
 CONFIG_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_FILE = os.path.join(CONFIG_DIR, "keras-text-cls.cfg")
+CONFIG_FILE = os.path.join(CONFIG_DIR, "keras_text_cls.cfg")
 
 
 class Config(object):

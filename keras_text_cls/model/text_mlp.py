@@ -9,37 +9,40 @@ class TextMLP(BaseModel):
     """
     Multiple Layer Perceptron for Text Classification
 
-    #Arguments
-        num_classes: int
-            the number of classes
-        embedding_dim: int
-            the dimention of embedding vector, default is 128
-        embedding_matrix: 2d np.array
-            embedding matrix, default is None
-        embedding_trainable: bool
-            is the embedding layer trainable in the network, must be set to True,
-            when embedding matrix is None. Default is True. Set False if embedding matrix is pre-trained
-            and set in the model
-        vocabs: dict {index: word}
-            vocab dict, key is the index, value if the corresponding word
-            index zero is reserved for <PADDING>
-            index one is reserved for <UNKNOWN>
-        pooling_strategy: str
-            pooling strategy for word sequences, either "REDUCE_MEAN" or "REDUCE_MAX"
-        max_seq_len: int
-            maximum length of words for each text, longer text will be truncated more than max_seq_len,
-            shorter text will be padded
-        num_hidden_units: integer array
-            an array of positive integers, indicating the number of units for each hidden layer
-        hidden_activation: str
-            activation function of neutral unit, default is "relu"
-        dropout: float (0,1)
-            dropout rate, must be equal or greater than 0 and equal or less than 1, default is 0.5
-        multi_label: bool
-            is the labels are multi-label classification, default is True
+    Attributes
+    ----------
+    num_classes: int
+        the number of classes
+    embedding_dim: int
+        the dimension of embedding vector, default is 128
+    embedding_matrix: 2d np.array
+        pre-trained embedding matrix is an array of embedding vector,
+            where index 0 must be reserved for SYMBOL_PADDING, index 1 must be reserved for SYMBOL_UNKNOWN
+        default is None
+    embedding_trainable: bool
+        Is the embedding layer trainable in the network. It must be set to True, when embedding matrix is None.
+        Default is False.
+        Set False if embedding matrix is pre-trained and set in the model
+    embedding_vocab_size: int
+        the vocabulary size for embedding.
+        Default is None, which indicates the size is equal to the length of embedding matrix
+        embedding_vocab_size must be set to initialize the size of the embedding layer, when embedding_matrix=None
+    pooling_strategy: str
+        pooling strategy for word sequences, either "REDUCE_MEAN" or "REDUCE_MAX"
+    max_seq_len: int
+        maximum length of words for each text, longer text will be truncated more than max_seq_len,
+        shorter text will be padded
+    num_hidden_units: integer array
+        an array of positive integers, indicating the number of units for each hidden layer
+    hidden_activation: str
+        activation function of neutral unit, default is "relu"
+    dropout: float (0,1)
+        dropout rate, must be equal or greater than 0 and equal or less than 1, default is 0.5
+    multi_label: bool
+        is the labels are multi-label classification, default is True
     """
     def __init__(self, num_classes,
-                 embedding_dim=128, embedding_matrix=None, embedding_trainable=True, vocabs=None,
+                 embedding_dim=128, embedding_matrix=None, embedding_trainable=False, embedding_vocab_size=None,
                  pooling_strategy="REDUCE_MEAN", max_seq_len=300,
                  num_hidden_units=[100], hidden_activation="relu",
                  dropout=0.5, multi_label=True):
@@ -60,12 +63,10 @@ class TextMLP(BaseModel):
             embedding_matrix = np.array(embedding_matrix)
             assert(len(embedding_matrix.shape) == 2)
             assert(embedding_matrix.shape[1] == embedding_dim)
-            if vocabs is not None:
+            if embedding_vocab_size is not None:
                 # validate the dim of vocabs and embedding matrix
-                if len(embedding_matrix) == len(vocabs):
-                    # add a zero vec for mask in embedding matrix
-                    embedding_matrix = np.concatenate([np.zeros(embedding_dim), embedding_matrix])
-                assert(len(vocabs) + 1 == len(embedding_matrix))
+                assert embedding_vocab_size == len(embedding_matrix)
+            logging.info("using provided embedding matrix with shape " + str(embedding_matrix.shape))
             self.layer_embedding = keras.layers.Embedding(len(embedding_matrix),
                                                           embedding_dim,
                                                           weights=[embedding_matrix],
@@ -73,10 +74,15 @@ class TextMLP(BaseModel):
                                                           trainable=embedding_trainable,
                                                           mask_zero=True)
         else:
-            assert vocabs is not None, "vocabs cannot be None when embedding matrix is None"
-            assert embedding_trainable, "embedding_trainable cannot be false when embedding matrix is None"
-            # vocabs contain masking zero already
-            self.layer_embedding = keras.layers.Embedding(len(vocabs),
+            if embedding_vocab_size is None:
+                raise ValueError("embedding_vocab_size must be set a positive integer"
+                                 " to indicate the input size of the embedding layer"
+                                 " when embedding_matrix=None")
+            if not embedding_trainable:
+                raise ValueError("embedding_trainable cannot be false when embedding_matrix=None")
+            logging.info("no pre-trained embedding matrix provided, init with shape "
+                         + str((embedding_vocab_size, embedding_dim)))
+            self.layer_embedding = keras.layers.Embedding(embedding_vocab_size,
                                                           embedding_dim,
                                                           input_length=max_seq_len,
                                                           trainable=True,
