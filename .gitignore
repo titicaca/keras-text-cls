@@ -2,6 +2,7 @@ venv
 .idea
 dist
 *.egg-info
+__pycache__
 
 # Precompiled Headers
 *.gch
