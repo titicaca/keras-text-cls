@@ -1,6 +1,7 @@
 import logging
 from keras_text_cls.vocab.util import *
 import pickle
+from tqdm import tqdm
 
 SYMBOL_PADDING = "<PADDING>"
 SYMBOL_UNKNOWN = "<UNKNOWN>"

@@ -43,7 +43,9 @@ setup(
             'numpy>=1.14.3',
             'Cython>=0.28.5',
             'fasttext>=0.8.3',
-            'keras>=2.2.4'
+            'keras>=2.2.4',
+            'scikit-learn>=0.20.0',
+            'tqdm'
         ],
     zip_safe=True,
 )

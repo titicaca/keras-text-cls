@@ -2,6 +2,7 @@ import logging
 import numpy as np
 import keras
 from keras_text_cls.model.base_model import BaseModel
+from keras_text_cls.model.utils import init_embedding_layer
 from keras_text_cls.layer import MaskedGlobalAvgPool1D
 
 
@@ -59,34 +60,8 @@ class TextMLP(BaseModel):
         self.dropout = dropout
         self.multi_label = multi_label
 
-        if embedding_matrix is not None:
-            embedding_matrix = np.array(embedding_matrix)
-            assert(len(embedding_matrix.shape) == 2)
-            assert(embedding_matrix.shape[1] == embedding_dim)
-            if embedding_vocab_size is not None:
-                # validate the dim of vocabs and embedding matrix
-                assert embedding_vocab_size == len(embedding_matrix)
-            logging.info("using provided embedding matrix with shape " + str(embedding_matrix.shape))
-            self.layer_embedding = keras.layers.Embedding(len(embedding_matrix),
-                                                          embedding_dim,
-                                                          weights=[embedding_matrix],
-                                                          input_length=max_seq_len,
-                                                          trainable=embedding_trainable,
-                                                          mask_zero=True)
-        else:
-            if embedding_vocab_size is None:
-                raise ValueError("embedding_vocab_size must be set a positive integer"
-                                 " to indicate the input size of the embedding layer"
-                                 " when embedding_matrix=None")
-            if not embedding_trainable:
-                raise ValueError("embedding_trainable cannot be false when embedding_matrix=None")
-            logging.info("no pre-trained embedding matrix provided, init with shape "
-                         + str((embedding_vocab_size, embedding_dim)))
-            self.layer_embedding = keras.layers.Embedding(embedding_vocab_size,
-                                                          embedding_dim,
-                                                          input_length=max_seq_len,
-                                                          trainable=True,
-                                                          mask_zero=True)
+        self.layer_embedding = init_embedding_layer(embedding_matrix, embedding_dim, embedding_vocab_size,
+                                                    embedding_trainable, max_seq_len, mask_zero=True)
 
         if pooling_strategy == "REDUCE_MEAN":
             self.layer_pooling = MaskedGlobalAvgPool1D()
@@ -113,7 +88,7 @@ class TextMLP(BaseModel):
 
     def call(self, inputs):
         """
-        :param inputs: 2-dim list, the element is the word index starting from 1
+        :param inputs: 2-dim list, the element is the word index
         :return: predicted class probabilities
         """
         x = self.layer_embedding(inputs)

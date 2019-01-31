@@ -5,6 +5,15 @@ from keras.engine.topology import Layer
 
 
 class MaskedGlobalAvgPool1D(Layer):
+    """
+    Masked Global Average Pooling for 1-Dimension Data
+    Masked position won't be calculated for avg pooling
+
+    Attributes
+    ----------
+    axis: int
+        the axis for average pooling calculation in the tensor, default 1
+    """
     def __init__(self, axis=1, **kwargs):
         self.supports_masking = True
         self.axis = axis

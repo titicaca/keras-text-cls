@@ -1,5 +1,6 @@
 import logging
 from abc import ABCMeta, abstractmethod
+from tqdm import tqdm
 
 
 class BaseTokenizer(object):
@@ -17,6 +18,6 @@ class BaseTokenizer(object):
         :return: a 2d list of word tokens
         """
         res = []
-        for sentence in text:
+        for sentence in tqdm(text):
             res.append(list(self.tokenize(sentence)))
         return res
