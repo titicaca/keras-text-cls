@@ -60,39 +60,45 @@ class TextMLP(BaseModel):
         self.dropout = dropout
         self.multi_label = multi_label
 
-        self.layer_embedding = init_embedding_layer(embedding_matrix, embedding_dim, embedding_vocab_size,
-                                                    embedding_trainable, max_seq_len, mask_zero=True)
+        layer_input = keras.layers.Input(shape=(self.max_seq_len,), dtype='int32')
+
+        layer_embedding = init_embedding_layer(embedding_matrix, embedding_dim, embedding_vocab_size,
+                                               embedding_trainable, max_seq_len, mask_zero=True)
 
         if pooling_strategy == "REDUCE_MEAN":
-            self.layer_pooling = MaskedGlobalAvgPool1D()
+            layer_pooling = MaskedGlobalAvgPool1D()
         elif pooling_strategy == "REDUCE_MAX":
-            self.layer_pooling = keras.layers.MaxPool1D()
+            layer_pooling = keras.layers.MaxPool1D()
         else:
             raise ValueError("Unknown pooling strategy, only REDUCE_MEAN, REDUCE_MAX are supported")
 
-        self.layer_hiddens = []
+        layer_hiddens = []
         prev_input_dim = embedding_dim
         for n in num_hidden_units:
-            self.layer_hiddens.append(
+            layer_hiddens.append(
                 keras.layers.Dense(n, input_dim=prev_input_dim, activation=hidden_activation)
             )
             if dropout > 0:
-                self.layer_hiddens.append(keras.layers.Dropout(dropout))
+                layer_hiddens.append(keras.layers.Dropout(dropout))
             prev_input_dim = n
 
         if multi_label:
             output_activation = "sigmoid"
         else:
             output_activation = "softmax"
-        self.layer_output = keras.layers.Dense(num_classes, activation=output_activation)
+        layer_output = keras.layers.Dense(num_classes, activation=output_activation)
+
+        x = layer_embedding(layer_input)
+        x = layer_pooling(x)
+        for hidden in layer_hiddens:
+            x = hidden(x)
+        output = layer_output(x)
+        self.model = keras.Model(layer_input, output)
 
     def call(self, inputs):
         """
-        :param inputs: 2-dim list, the element is the word index
+        :param inputs: 2-dim np.array, the element is the word index
         :return: predicted class probabilities
         """
-        x = self.layer_embedding(inputs)
-        x = self.layer_pooling(x)
-        for hidden in self.layer_hiddens:
-            x = hidden(x)
-        return self.layer_output(x)
+        assert len(inputs.shape) == 2
+        return self.model(inputs)
