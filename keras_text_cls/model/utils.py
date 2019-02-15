@@ -1,6 +1,7 @@
 import keras
 import logging
 import numpy as np
+from keras.preprocessing.sequence import pad_sequences
 
 
 def init_embedding_layer(embedding_matrix, embedding_dim, embedding_vocab_size, embedding_trainable, max_seq_len,
@@ -34,3 +35,30 @@ def init_embedding_layer(embedding_matrix, embedding_dim, embedding_vocab_size, 
                                                   trainable=True,
                                                   mask_zero=mask_zero)
     return layer_embedding
+
+
+def pad_text_indices(inputs, max_seq_len, max_sentence_len=None, dim=2):
+    """
+    Pad text indices
+    :param inputs: list of indices
+    :param max_seq_len: int
+    :param max_sentence_len: int, only set when dim=3
+    :param dim: 2 or 3, default is 2
+    :return: padded text indices
+    """
+    assert dim == 2 or dim == 3
+    assert max_seq_len > 0
+    if dim == 3:
+        assert max_sentence_len is not None and max_sentence_len > 0
+        inputs = [pad_sequences(sent_indices, maxlen=max_sentence_len, padding='post', value=0.).tolist()
+                  for sent_indices in inputs]
+        max_num_sentence = max_seq_len
+        if len(inputs) > max_num_sentence:
+            inputs = inputs[:max_num_sentence]
+        else:
+            for sents in inputs:
+                while len(sents) < max_num_sentence:
+                    sents.append(np.zeros(max_sentence_len))
+        return np.array(inputs)
+    else:
+        return pad_sequences(inputs, maxlen=max_seq_len, padding='post', value=0.)

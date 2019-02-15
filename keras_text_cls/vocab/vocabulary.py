@@ -73,17 +73,21 @@ class Vocabulary(object):
         """
         transform words to indices
         :param words: list of words
-        :param dim: indicating the dim of words, either 1 or 2, default is 2
+        :param dim: indicating the dim of words, could be 1, 2 or 3, default is 2
         :return: list of indices
         """
         if not self.is_fitted:
             raise ValueError("vocabulary need to be fitted first")
-        assert(dim == 1 or dim == 2)
+        assert(dim == 1 or dim == 2 or dim == 3)
         if dim == 1:
             return [self.word2idx[w] if w in self.word2idx.keys() else 1 for w in words]
-        else:
+        elif dim == 2:
             return [[self.word2idx[w] if w in self.word2idx.keys() else 1
-                     for w in sentence_tokens] for sentence_tokens in words]
+                     for w in doc_tokens] for doc_tokens in words]
+        else:
+            return [[[self.word2idx[w] if w in self.word2idx.keys() else 1
+                    for w in sentence_tokens] for sentence_tokens in doc_tokens]
+                    for doc_tokens in words]
 
     def idx_to_words(self, indices, dim=2):
         """
