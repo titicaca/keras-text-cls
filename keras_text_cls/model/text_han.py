@@ -9,8 +9,47 @@ from keras.models import Model
 
 class TextHAN(BaseModel):
     """
-    Text RCNN Model
+    Text HAN Model constructs hierarchical attention networks for document classification.
+
+    More details about HAN can be found in paper:
+    <a href="http://www.aclweb.org/anthology/N16-1174">Hierarchical attention networks for document classification</a>
+
+    Attributes
+    ----------
+    num_classes: int
+        the number of classes
+    embedding_dim: int
+        the dimension of embedding vector, default is 128
+    embedding_matrix: 2d np.array
+        pre-trained embedding matrix is an array of embedding vector,
+            where index 0 must be reserved for SYMBOL_PADDING, index 1 must be reserved for SYMBOL_UNKNOWN
+        default is None
+    embedding_trainable: bool
+        Is the embedding layer trainable in the network. It must be set to True, when embedding matrix is None.
+        Default is False.
+        Set False if embedding matrix is pre-trained and set in the model
+    embedding_vocab_size: int
+        the vocabulary size for embedding.
+        Default is None, which indicates the size is equal to the length of embedding matrix
+        embedding_vocab_size must be set to initialize the size of the embedding layer, when embedding_matrix=None
+    word_rnn_hidden_units: int
+        the number of rnn hidden units for word-level encoder, default is 100
+    sent_rnn_hidden_units: int
+        the number of rnn hidden units for sentence-level encoder, default is 100
+    rnn_type: str,
+        rnn type, either GRU or LSTM, default is GRU
+    max_sentence_len: int
+        maximum length of words for each sentence, longer text will be truncated more than max_sentence_len,
+        shorter text will be padded
+    max_num_sentence: int
+        maximum number of sentences for each document, more sentences will be truncated more than max_num_sentence,
+        less sentences will be padded
+    dropout: float (0,1)
+        dropout rate, must be equal or greater than 0 and equal or less than 1, default is 0.5
+    multi_label: bool
+        is the labels are multi-label classification, default is True
     """
+
     def __init__(self, num_classes,
                  embedding_dim=128, embedding_matrix=None, embedding_trainable=False, embedding_vocab_size=None,
                  word_rnn_hidden_units=100, sent_rnn_hidden_units=100, rnn_type="GRU",

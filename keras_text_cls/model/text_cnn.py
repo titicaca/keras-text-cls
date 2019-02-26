@@ -7,7 +7,47 @@ from keras.layers import Dense, Flatten, Dropout, Conv1D, MaxPooling1D, concaten
 
 class TextCNN(BaseModel):
     """
-    Text CNN Model
+    Text CNN Model constructs convolutional neutral networks for text classification
+
+    More details about HAN can be found in paper:
+    <a href="http://emnlp2014.org/papers/pdf/EMNLP2014181.pdf">Convolutional Neural Networks for Sentence Classification</a>
+
+    Attributes
+    ----------
+    num_classes: int
+        the number of classes
+    embedding_dim: int
+        the dimension of embedding vector, default is 128
+    embedding_matrix: 2d np.array
+        pre-trained embedding matrix is an array of embedding vector,
+            where index 0 must be reserved for SYMBOL_PADDING, index 1 must be reserved for SYMBOL_UNKNOWN
+        default is None
+    embedding_trainable: bool
+        Is the embedding layer trainable in the network. It must be set to True, when embedding matrix is None.
+        Default is False.
+        Set False if embedding matrix is pre-trained and set in the model
+    embedding_vocab_size: int
+        the vocabulary size for embedding.
+        Default is None, which indicates the size is equal to the length of embedding matrix
+        embedding_vocab_size must be set to initialize the size of the embedding layer, when embedding_matrix=None
+    num_filters: int
+        the number of conv filters, default is 50
+    filter_sizes: list of integers
+        each element indicates the window size of conv filters, default is [2,3,4,5]
+        the total number of filters are equal to `num_filters * len(filter_sizes)`
+    pooling_strategy: str,
+         pooling strategy for word sequences, either "REDUCE_MEAN" or "REDUCE_MAX"
+    max_seq_len: int
+        maximum length of words for each text, longer text will be truncated more than max_seq_len,
+        shorter text will be padded
+    num_hidden_units: integer array
+        an array of positive integers, indicating the number of units for each hidden layer, default is []
+    hidden_activation: str
+        activation function of neutral unit, default is "relu"
+    dropout: float (0,1)
+        dropout rate, must be equal or greater than 0 and equal or less than 1, default is 0.5
+    multi_label: bool
+        is the labels are multi-label classification, default is True
     """
     def __init__(self, num_classes,
                  embedding_dim=128, embedding_matrix=None, embedding_trainable=False, embedding_vocab_size=None,

@@ -8,7 +8,7 @@ from keras_text_cls.embedding import *
 class TestModel(unittest.TestCase):
     def setUp(self):
         # list of document
-        self.text = ['我爱北京天安门', '天安门上太阳升']
+        self.text = ['我爱北京天安门，天安门上太阳升', '上海是全国的科技、贸易、信息、金融和航运中心']
         # list of document-sentence
         self.sent_text = [['我爱北京天安门', '天安门上太阳升'], ['上海是中国共产党的诞生地', '全国的科技、贸易、信息、金融和航运中心']]
 
