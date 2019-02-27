@@ -105,11 +105,9 @@ y_pred = (y_prob >= 0.5).astype(int)
 Benchmark on public datasets is to be added.
 
 
-## Build and install from source
+## Install via pip
 
-`python setup.py sdist`
-
-`pip install dist/keras_text_cls-<version>.tar.gz`
+pip install git+https://github.com/titicaca/keras-text-cls.git
 
 ## Requirements
 
