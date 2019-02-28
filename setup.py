@@ -4,14 +4,14 @@ import sys
 import io
 
 setup(
-    name="keras_text_cls",
+    name="keras-text-cls",
     version="0.1.0",
     author="Titicaca",
     author_email="lake_titicaca@outlook.com",
     description="Text Classification Lib on Keras",
     long_description=io.open("README.md", encoding="UTF-8").read(),
     license="MIT",
-    url="https://github.com/titicaca/keras_text_cls",
+    url="https://github.com/titicaca/keras-text-cls",
     packages=find_packages(),
     entry_points={
     },
