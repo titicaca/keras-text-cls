@@ -1,5 +1,6 @@
 # Text Classification Lib on Keras
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.org/titicaca/keras-text-cls.svg?branch=master)](https://travis-ci.org/titicaca/keras-text-cls)
 
 KERAS-TEXT-CLS is a deep learning text classification library based on [KERAS](https://keras.io/). 
 It designs an abstract text classification pipeline including tokenizer, 
