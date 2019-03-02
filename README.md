@@ -89,8 +89,8 @@ text_mlp = TextMLP(num_classes=2,
 
 # Compile the keras model
 text_mlp.compile(loss='categorical_crossentropy',
-        optimizer='adam',
-      metrics=['acc'])
+                 optimizer='adam',
+                 metrics=['acc'])
 
 # Train the keras model 
 text_mlp.fit(inputs, labels, epochs=100, batch_size=10)
